@@ -3,45 +3,61 @@ import cors from "cors";
 const app = express();
 import dotenv from "dotenv";
 import { createClient } from "@deepgram/sdk";
+import fs from "fs";
 import multer from "multer";
-import axios from "axios";
+
 dotenv.config();
 const port = 3000;
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 app.use(express.json());
 app.use(cors());
 
+const transcribeFile = async (filePath) => {
+  const deepgram = createClient(process.env.DEEPGRAM);
+  const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
+    fs.readFileSync(filePath),
+    {
+      model: "nova-2",
+      smart_format: true,
+    }
+  );
+
+  if (error) throw error;
+  if (!error) console.dir(result, { depth: null });
+  return result;
+};
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+  destination: function (req, file, cb) {
+    cb(null, "./uploads");
+  },
+});
+const upload = multer({ storage });
+app.post("/upload_files", upload.single("file"), async (req, res) => {
+  try {
+    const filePath = req.file.path;
+    const transcriptionResult = await transcribeFile(filePath);
+    const result =
+      transcriptionResult.results.channels[0].alternatives[0].transcript;
+    res.json({
+      message: "Successfully uploaded and transcribed file",
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error uploading or transcribing file",
+      error: error.message,
+    });
+  }
+});
 app.get("/", (req, res) => {
   res.send("hello world");
 });
 
-app.post("/transcribe", upload.single("file"), async (req, res) => {
-  try {
-    const fileBuffer = req.file.buffer; // Get the file buffer
-
-    // Send the file buffer to Deepgram API for transcription
-    const response = await axios.post(
-      "https://api.deepgram.com/v1/listen",
-      fileBuffer,
-      {
-        headers: {
-          "Content-Type": "audio/wav",
-          Authorization: `Token YOUR_DEEPGRAM_API_KEY`, // Replace with your Deepgram API key
-        },
-      }
-    );
-
-    // Send the transcription back to the client
-    res.json({
-      transcription:
-        response.data.results.channels[0].alternatives[0].transcript,
-    });
-  } catch (error) {
-    console.error("Error transcribing audio:", error);
-    res.status(500).json({ error: "Error transcribing audio" });
-  }
-});
 app.listen(port, () => {
   console.log("app is rnnign");
 });
