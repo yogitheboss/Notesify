@@ -1,9 +1,10 @@
 // components/NoteItem.jsx
 import React, { useState } from "react";
-
+import ReactMarkdown from "react-markdown";
 const NoteItem = ({ note, index, removeNote }) => {
   const audioURL = URL.createObjectURL(note);
-  const [transcript, setTranscript] = useState([]);
+  const [transcript, setTranscript] = useState("");
+  const [notes, setNotes] = useState("");
   const uploadAudio = async () => {
     const formData = new FormData();
     // Create a meaningful file name with the correct extension (e.g., .mp3)
@@ -19,7 +20,8 @@ const NoteItem = ({ note, index, removeNote }) => {
       });
       const data = await response.json();
       console.log(data);
-      setTranscript(data.data);
+      setTranscript(data.data.transcript);
+      setNotes(data.data.notes);
       console.log("File uploaded successfully:", data.message);
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -43,7 +45,17 @@ const NoteItem = ({ note, index, removeNote }) => {
           Delete
         </button>
       </div>
-      <div>{transcript}</div>
+      <div>
+        {transcript && notes ? (
+          <>
+            {" "}
+            <h3 className="text-xl mt-4">Transcript:</h3>
+            <ReactMarkdown>{transcript}</ReactMarkdown>
+            <h3 className="text-xl mt-4">Notes</h3>
+            <ReactMarkdown>{notes}</ReactMarkdown>
+          </>
+        ) : null}
+      </div>
     </>
   );
 };

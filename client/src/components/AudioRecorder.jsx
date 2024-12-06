@@ -1,6 +1,7 @@
 // components/AudioRecorder.jsx
 import React, { useState } from "react";
-
+import { AiTwotoneAudio } from "react-icons/ai";
+import { AiOutlineAudioMuted } from "react-icons/ai";
 const AudioRecorder = ({ addNote }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -23,23 +24,29 @@ const AudioRecorder = ({ addNote }) => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded-md shadow-md">
-      <h2 className="text-xl mb-4">Record a Note</h2>
+    <div className="p-4 bg-gray-100 rounded-md shadow-md flex align-item flex-col">
+      <h2 className="text-xl text-center mb-4">Record a Note</h2>
       {isRecording ? (
         <button
           onClick={() => {
             stopRecording();
           }}
-          className="bg-red-500 text-white px-4 py-2 rounded"
+          className="bg-red-500 mx-auto   text-white px-4 py-2 rounded flex flex-col items-center w-30"
         >
-          Stop Recording
+          <span>
+            <AiOutlineAudioMuted style={{ fontSize: "2rem" }} />
+          </span>
+          <span>Stop Recording</span>
         </button>
       ) : (
         <button
           onClick={startRecording}
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="bg-green-500 w-30 mx-auto text-white px-4 py-2 rounded flex flex-col text-center  items-center"
         >
-          Start Recording
+          <span>
+            <AiTwotoneAudio style={{ fontSize: "2rem" }} />
+          </span>
+          <spa>Start Recording</spa>
         </button>
       )}
     </div>

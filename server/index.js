@@ -5,8 +5,12 @@ import dotenv from "dotenv";
 import { createClient } from "@deepgram/sdk";
 import fs from "fs";
 import multer from "multer";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
+console.log(process.env.GEMINI_KEY, "AIzaSyBfVzq8Dz3u6OlriVOUUpt5lfwQhCyYRWk");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 const port = 3000;
 app.use(express.json());
 app.use(cors());
@@ -40,11 +44,20 @@ app.post("/upload_files", upload.single("file"), async (req, res) => {
   try {
     const filePath = req.file.path;
     const transcriptionResult = await transcribeFile(filePath);
-    const result =
+    const resultTrans =
       transcriptionResult.results.channels[0].alternatives[0].transcript;
+    const prompt = `You are a notemaker for students. elaborate on topics discussed in the transcript given.Create a note from the lecture transcript: ${resultTrans}`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log(text);
     res.json({
       message: "Successfully uploaded and transcribed file",
-      data: result,
+      data: {
+        transcript: resultTrans,
+        notes: text,
+      },
     });
   } catch (error) {
     console.log(error);
