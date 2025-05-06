@@ -7,6 +7,7 @@ interface Note {
   content: string;
   createdAt: string;
   updatedAt: string;
+  internetGenNotes: string;
 }
 
 interface NotesState {

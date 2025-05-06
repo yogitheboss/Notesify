@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Make sure this matches your server's URL and API prefix
-const BASE_URL = "http://192.168.1.16:3000";
+const BASE_URL = "http://192.168.1.15:3000";
 
 // Create a function that gets the token from AsyncStorage or store
 const getAuthToken = async () => {

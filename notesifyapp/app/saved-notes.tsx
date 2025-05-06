@@ -12,6 +12,7 @@ import { useNotesStore } from "@/store/notes";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { formatDistanceToNow } from "date-fns";
+import Markdown from "react-native-markdown-display";
 
 const SavedNotes = () => {
   const { notes, getNotes } = useNotesStore();
@@ -55,6 +56,7 @@ const SavedNotes = () => {
 
   const truncateText = (text: string, maxLength: number) => {
     if (!text) return "";
+    // We'll keep the markdown syntax for the preview now
     return text.length > maxLength
       ? text.substring(0, maxLength) + "..."
       : text;
@@ -108,9 +110,16 @@ const SavedNotes = () => {
                 <Text className="text-white text-xl font-bold mb-2">
                   {note.title || "Untitled Note"}
                 </Text>
-                <Text className="text-gray-400 mb-3">
-                  {truncateText(note.content, 100)}
-                </Text>
+                <View className="mb-3">
+                  <Markdown
+                    style={{
+                      body: { color: "#9ca3af" }, // text-gray-400 equivalent
+                      paragraph: { marginVertical: 0 },
+                    }}
+                  >
+                    {truncateText(note.content, 100)}
+                  </Markdown>
+                </View>
                 <View className="flex-row justify-between items-center">
                   <Text className="text-gray-500 text-xs">
                     {formatDate(note.updatedAt)}

@@ -17,6 +17,12 @@ export default function RootLayout() {
 
       <Stack.Screen name="auth/index" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
+      <Stack.Screen
+        name="create-notes/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="saved-notes" options={{ headerShown: false }} />
+      <Stack.Screen name="note/[id]" options={{ headerShown: false }} />
     </Stack>
   );
 }

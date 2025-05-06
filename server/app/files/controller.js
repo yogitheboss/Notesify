@@ -23,17 +23,22 @@ export const uploadFile = async (req, res) => {
     const transcriptionResult = await transcribeFile(filePath);
     const result =
       transcriptionResult.results.channels[0].alternatives[0].transcript;
-    const notes = await generateNotes(result);
+    const prompt = `You are a notemaker for students. elaborate on topics discussed in the transcript given. Create a note from the lecture transcript and also provide proper title for the note: ${result} return the response in json format as {
+      "title": "Title of the note",
+      "content": "Content of the note(in markdown format)"
+    }`;
+    const notes = await generateNotes(prompt);
     const note = await NoteModel.create({
-      title: "New Note",
-      content: notes,
+      title: notes.title,
+      content: notes.content,
       userId: user.id,
       transcript: result,
+      internetGenNotes: notes.internetGenNotes,
     });
     res.json({
       message: "Successfully uploaded and transcribed file",
       data: result,
-      notes: notes,
+      notes: notes.content,
     });
   } catch (error) {
     console.log(error);
