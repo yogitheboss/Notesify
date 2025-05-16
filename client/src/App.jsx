@@ -1,31 +1,27 @@
 // App.jsx
-import React, { useState } from "react";
-import AudioRecorder from "./components/AudioRecorder";
-import NoteList from "./components/NoteList";
-import Sidebar from "./components/Sidebar";
-
+import React from "react";
+import { Routes, Route } from "react-router";
+import Main from "./pages/Main";
+import "./App.css";
+// Import other pages as needed
+import SigninPage from "./pages/Signin";
+import SignUpPage from "./pages/SignUp";
+import ErrorPage from "./pages/Error";
+import { Navigate } from "react-router";
+import ProtectedRoute from "./components/ProtectedRoute";
 const App = () => {
-  const [notes, setNotes] = useState([]);
-  const [tab, setTab] = useState("create");
-  const addNote = (audioBlob) => {
-    setNotes([...notes, audioBlob]);
-  };
-
-  const removeNote = (indexToRemove) => {
-    const updatedNotes = notes.filter((_, index) => index !== indexToRemove);
-    setNotes(updatedNotes);
-  };
-
   return (
-    <div className="container mx-auto h-screen p-4 -700 flex ">
-      <Sidebar tab={tab} setTab={setTab} />
-      <div className="w-full p-4">
-        <h1 className="text-2xl font-bold mb-4">
-          AI powered Lecture Note taker
-        </h1>
-        <AudioRecorder addNote={addNote} />
-        <NoteList notes={notes} removeNote={removeNote} />
-      </div>
+    <div className="app ">
+      <Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Main />} />
+        </Route>
+        <Route path="/login" element={<Navigate to="/signin" />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/signin" element={<SigninPage />} />
+        {/* default route */}
+        <Route path="/*" element={<ErrorPage />} />
+      </Routes>
     </div>
   );
 };
